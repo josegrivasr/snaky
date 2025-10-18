@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Snack Vending - Tu Máquina Expendedora 24/7",
-  description: "Compra snacks, bebidas y más desde tu apartamento. Disponible 24/7 con entrega rápida.",
+  title: "Snaky shop",
+  description: "Buy snacks, drinks and more from your apartment. Available 24/7 with fast delivery.",
 };
 
 export default function RootLayout({
