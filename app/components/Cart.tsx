@@ -3,6 +3,20 @@
 import React from 'react';
 import { ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react';
 import { CartItem } from '../../types';
+import ImageLoader from './ImageLoader';
+
+// Cart Item Image Component
+const CartItemImage = ({ item }: { item: CartItem }) => {
+  return (
+    <ImageLoader
+      src={item.image}
+      alt={item.name}
+      className="w-full h-full object-contain rounded"
+      fallback={<span className="text-lg">🛍️</span>}
+      loadingComponent={<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>}
+    />
+  );
+};
 
 interface BasketProps {
   cart: CartItem[];
@@ -38,25 +52,7 @@ export default function Basket({ cart, onUpdateQuantity, onRemoveFromCart, onPro
             {cart.map(item => (
               <div key={item.id} className="bg-slate-700/50 rounded-lg p-3 flex items-center gap-3 border border-slate-600">
                 <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm">
-                  {item.image.startsWith('http') ? (
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-full h-full object-contain rounded"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                        if (nextElement) {
-                          nextElement.style.display = 'block';
-                        }
-                      }}
-                    />
-                  ) : null}
-                  <span 
-                    className={`text-lg ${item.image.startsWith('http') ? 'hidden' : 'block'}`}
-                  >
-                    {item.image}
-                  </span>
+                  <CartItemImage item={item} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-slate-100 text-sm truncate">{item.name}</p>
@@ -117,25 +113,7 @@ export default function Basket({ cart, onUpdateQuantity, onRemoveFromCart, onPro
           <div key={item.id} className="bg-slate-700/50 rounded-xl p-3 border border-slate-600 shadow-lg">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-12 h-12 flex items-center justify-center bg-white rounded-lg shadow-sm">
-                {item.image.startsWith('http') ? (
-                  <img 
-                    src={item.image} 
-                    alt={item.name}
-                    className="w-full h-full object-contain rounded"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                      if (nextElement) {
-                        nextElement.style.display = 'block';
-                      }
-                    }}
-                  />
-                ) : null}
-                <span 
-                  className={`text-xl ${item.image.startsWith('http') ? 'hidden' : 'block'}`}
-                >
-                  {item.image}
-                </span>
+                <CartItemImage item={item} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-slate-100 text-sm truncate">{item.name}</p>

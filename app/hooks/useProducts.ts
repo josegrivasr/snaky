@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Product } from '../../types';
 
+// Helper function to preload images
+const preloadImages = (products: Product[]) => {
+  products.forEach(product => {
+    if (product.image && product.image.startsWith('http')) {
+      const img = new Image();
+      img.src = product.image;
+      // Don't need to handle onload/onerror here as individual components will handle it
+    }
+  });
+};
+
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +38,11 @@ export const useProducts = () => {
           throw new Error(data.error);
         }
         
-        setProducts(data.products || []);
+        const fetchedProducts = data.products || [];
+        setProducts(fetchedProducts);
+        
+        // Preload images for better user experience
+        preloadImages(fetchedProducts);
       } catch (err) {
         console.error('Error fetching products:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch products');
@@ -58,7 +73,11 @@ export const useProducts = () => {
         throw new Error(data.error);
       }
       
-      setProducts(data.products || []);
+      const fetchedProducts = data.products || [];
+      setProducts(fetchedProducts);
+      
+      // Preload images for better user experience
+      preloadImages(fetchedProducts);
     } catch (err) {
       console.error('Error refetching products:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch products');
