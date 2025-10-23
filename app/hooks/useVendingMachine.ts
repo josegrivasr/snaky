@@ -73,7 +73,6 @@ export const useVendingMachine = (initialProducts: Product[] = [], refetchProduc
 
           if (!response.ok) {
             const errorData = await response.json();
-            console.error(`Failed to update stock for ${item.name}:`, errorData.error);
             return { success: false, item: item.name, error: errorData.error };
           }
 
@@ -86,10 +85,8 @@ export const useVendingMachine = (initialProducts: Product[] = [], refetchProduc
         // Log any failed stock updates
         const failedUpdates = stockUpdateResults.filter(result => !result.success);
         if (failedUpdates.length > 0) {
-          console.warn('Some stock updates failed:', failedUpdates);
         }
       } catch (stockError) {
-        console.error('Error updating stock:', stockError);
       }
     };
 
@@ -109,10 +106,8 @@ export const useVendingMachine = (initialProducts: Product[] = [], refetchProduc
         });
 
         if (!emailResponse.ok) {
-          console.error('Failed to send confirmation email');
         }
       } catch (emailError) {
-        console.error('Error sending confirmation email:', emailError);
       }
     };
 

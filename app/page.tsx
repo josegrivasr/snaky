@@ -9,7 +9,6 @@ import PaymentForm from './components/PaymentForm';
 import PaymentSuccess from './components/PaymentSuccess';
 import PaymentError from './components/PaymentError';
 import CustomerInfoModal from './components/CustomerInfoModal';
-import BusinessHoursManager from './components/BusinessHoursManager';
 
 // Data & Hooks
 import { useVendingMachine } from './hooks/useVendingMachine';
@@ -58,9 +57,6 @@ const VendingMachine = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-2 sm:p-4 md:p-8 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-blue-900/20 via-transparent to-blue-900/20 pointer-events-none"></div>
-      
-      {/* Business Hours Manager */}
-      <BusinessHoursManager />
       
       <div className="max-w-7xl mx-auto relative">
           <div className="mb-4 sm:mb-6 md:mb-8">
@@ -120,9 +116,6 @@ const VendingMachine = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-2 sm:p-4 md:p-8 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-blue-900/20 via-transparent to-blue-900/20 pointer-events-none"></div>
-      
-      {/* Business Hours Manager */}
-      <BusinessHoursManager />
       
       <div className={`max-w-7xl mx-auto relative transition-all duration-300 ${cart.length > 0 ? 'lg:ml-80' : ''}`}>
         <div className="mb-4 sm:mb-6 md:mb-8">

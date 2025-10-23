@@ -3,6 +3,7 @@
 import React from 'react';
 import { Product } from '../../types';
 import ImageLoader from './ImageLoader';
+import { useBusinessHours } from '../hooks/useBusinessHours';
 
 interface ProductGridProps {
   products: Product[];
@@ -17,9 +18,11 @@ const ProductCard = ({ product, quantityInCart, onAddToCart }: {
   quantityInCart: number; 
   onAddToCart: (product: Product) => void; 
 }) => {
+  const isOpen = useBusinessHours();
   const availableStock = product.stock - quantityInCart;
   const isOutOfStock = product.stock === 0;
   const isMaxInCart = quantityInCart >= product.stock;
+  const isOutsideBusinessHours = !isOpen;
 
   return (
     <div
@@ -92,23 +95,28 @@ const ProductCard = ({ product, quantityInCart, onAddToCart }: {
         {/* Select Button */}
         <button
           onClick={() => onAddToCart(product)}
-          disabled={isOutOfStock || isMaxInCart}
+          disabled={isOutOfStock || isMaxInCart || isOutsideBusinessHours}
           className={`select-btn w-full py-2 rounded-lg font-bold text-sm transition-all duration-200 shadow-lg ${
             isOutOfStock
               ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
               : isMaxInCart
               ? 'bg-amber-600 text-white cursor-not-allowed hover:bg-amber-700'
+              : isOutsideBusinessHours
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
               : product.stock > 10
               ? 'bg-emerald-500 text-white hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 hover:shadow-xl'
               : product.stock > 5
               ? 'bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transform hover:scale-105 hover:shadow-xl'
               : 'bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 transform hover:scale-105 hover:shadow-xl'
           }`}
+          title={isOutsideBusinessHours ? 'Purchases only available during business hours (Mon-Fri: 5:00 PM - 10:30 PM, Sat-Sun: All Day)' : ''}
         >
           {isOutOfStock 
             ? 'SOLD OUT' 
             : isMaxInCart 
             ? 'MAX IN BASKET' 
+            : isOutsideBusinessHours
+            ? 'CLOSED'
             : 'SELECT'
           }
         </button>

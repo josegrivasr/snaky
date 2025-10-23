@@ -10,7 +10,6 @@ export async function GET(request: NextRequest) {
   try {
     // Check if Stripe key is configured
     if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('Stripe secret key not configured');
       return NextResponse.json(
         { error: 'Stripe not configured' },
         { status: 500 }
@@ -107,9 +106,6 @@ export async function GET(request: NextRequest) {
     });
 
     // Log for debugging
-    console.log(`Fetched ${allProducts.length} total products from Stripe`);
-    console.log(`Returning ${filteredProducts.length} active products with stock > 0`);
-    console.log('Product names:', filteredProducts.map(p => p.name));
     
     return NextResponse.json({ 
       products: filteredProducts,
@@ -118,8 +114,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching products from Stripe:', error);
-    
     // Handle specific Stripe errors
     if (error instanceof Stripe.errors.StripeError) {
       return NextResponse.json(

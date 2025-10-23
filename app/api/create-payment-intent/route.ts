@@ -10,7 +10,6 @@ export async function POST(request: NextRequest) {
   try {
     // Check if Stripe key is configured
     if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('Stripe secret key not configured');
       return NextResponse.json(
         { error: 'Payment system not configured' },
         { status: 500 }
@@ -74,7 +73,6 @@ export async function POST(request: NextRequest) {
       paymentIntentId: paymentIntent.id 
     });
   } catch (error) {
-    console.error('Error creating payment intent:', error);
     
     // Handle specific Stripe errors
     if (error instanceof Stripe.errors.StripeError) {

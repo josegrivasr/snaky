@@ -26,15 +26,12 @@ export const useProducts = () => {
         const response = await fetch('/api/products');
         
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Response not ok:', errorText);
           throw new Error(`Failed to fetch products: ${response.statusText}`);
         }
         
         const data = await response.json();
         
         if (data.error) {
-          console.error('Error in response:', data.error);
           throw new Error(data.error);
         }
         
@@ -44,7 +41,6 @@ export const useProducts = () => {
         // Preload images for better user experience
         preloadImages(fetchedProducts);
       } catch (err) {
-        console.error('Error fetching products:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch products');
         // Fallback to empty array on error - in production you might want to show cached data
         setProducts([]);
@@ -79,7 +75,6 @@ export const useProducts = () => {
       // Preload images for better user experience
       preloadImages(fetchedProducts);
     } catch (err) {
-      console.error('Error refetching products:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch products');
     } finally {
       setLoading(false);

@@ -49,7 +49,6 @@ function PaymentFormInner({ cart, orderData, onPaymentSuccess, onPaymentError, o
       });
 
       if (error) {
-        console.error('Payment error:', error);
         onPaymentError(error.message || 'Payment failed');
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         onPaymentSuccess();
@@ -57,7 +56,6 @@ function PaymentFormInner({ cart, orderData, onPaymentSuccess, onPaymentError, o
         onPaymentError('Payment was not completed. Please try again.');
       }
     } catch (err) {
-      console.error('Payment submission error:', err);
       
       // Handle specific Stripe fetch errors
       if (err instanceof Error && err.message.includes('Failed to fetch')) {
@@ -153,7 +151,6 @@ export default function PaymentForm(props: PaymentFormProps) {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       if (event.reason && event.reason.message && event.reason.message.includes('Failed to fetch')) {
         // Suppress Stripe fetch errors that don't affect user experience
-        console.warn('Stripe fetch error suppressed:', event.reason.message);
         event.preventDefault();
       }
     };
@@ -193,7 +190,6 @@ export default function PaymentForm(props: PaymentFormProps) {
         setClientSecret(data.clientSecret);
         setIsLoading(false);
       } catch (error) {
-        console.error('Payment initialization error:', error);
         props.onPaymentError(error instanceof Error ? error.message : 'Failed to initialize payment');
         setIsLoading(false);
       }

@@ -113,7 +113,6 @@ $${totalAmount.toFixed(2)}
 
     return NextResponse.json({ success: true, message: 'Confirmation emails sent successfully' });
   } catch (error) {
-    console.error('Error sending confirmation email:', error);
     return NextResponse.json(
       { error: 'Failed to send confirmation email', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

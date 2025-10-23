@@ -10,7 +10,6 @@ export async function POST(request: NextRequest) {
   try {
     // Check if Stripe key is configured
     if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('Stripe secret key not configured');
       return NextResponse.json(
         { error: 'Stripe not configured' },
         { status: 500 }
@@ -65,7 +64,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error updating stock:', error);
     
     // Handle specific Stripe errors
     if (error instanceof Stripe.errors.StripeError) {
