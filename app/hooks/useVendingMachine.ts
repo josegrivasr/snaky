@@ -90,7 +90,7 @@ export const useVendingMachine = (initialProducts: Product[] = [], refetchProduc
       }
     };
 
-    // Send confirmation email in background (non-blocking)
+    // Send confirmation email using delivery form data (no need to fetch from Stripe metadata)
     const sendEmailInBackground = async () => {
       try {
         const emailResponse = await fetch('/api/send-confirmation', {

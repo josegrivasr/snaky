@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-// Initialize Stripe with proper error handling
+// Initialize Stripe with production keys
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2025-09-30.clover',
 });
@@ -112,7 +112,6 @@ export async function GET(request: NextRequest) {
       count: filteredProducts.length,
       totalFetched: allProducts.length
     });
-
   } catch (error) {
     // Handle specific Stripe errors
     if (error instanceof Stripe.errors.StripeError) {
