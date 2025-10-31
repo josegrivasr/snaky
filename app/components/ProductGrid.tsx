@@ -141,6 +141,15 @@ export default function ProductGrid({ products, onAddToCart, cart = [] }: Produc
             );
           })}
         </div>
+        
+        {/* Disclaimer */}
+        <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-600/50">
+          <div className="bg-amber-900/20 rounded-lg p-3 sm:p-4 border border-amber-700/50">
+            <p className="text-xs sm:text-sm text-amber-200 text-center">
+              <span className="font-semibold">Delivery Information:</span> Orders typically arrive within 5-15 minutes of purchase. If you place your order outside of business hours (Mon-Fri 5:00 PM - 10:30 PM, Sat-Sun All Day), your order will arrive as soon as the store opens.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
