@@ -3,13 +3,30 @@
 import React from 'react';
 import { CheckCircle, Home, ArrowLeft } from 'lucide-react';
 import { OrderData } from '../../types';
+import { OrderRewardsReceipt, toView } from '../../lib/rewards';
+import RewardsCard from './RewardsCard';
 
 interface PaymentSuccessProps {
   orderData: OrderData;
+  rewardsReceipt?: OrderRewardsReceipt | null;
   onReturnToProducts: () => void;
 }
 
-export default function PaymentSuccess({ orderData, onReturnToProducts }: PaymentSuccessProps) {
+export default function PaymentSuccess({ orderData, rewardsReceipt, onReturnToProducts }: PaymentSuccessProps) {
+  const progress = rewardsReceipt
+    ? toView({
+        stamps: rewardsReceipt.stamps,
+        orders: 0,
+        pending: rewardsReceipt.unlocked,
+        firstName: rewardsReceipt.firstName,
+        referralCode: rewardsReceipt.referralCode,
+      })
+    : null
+  const notes = [
+    rewardsReceipt?.bonus ? 'BONUS! You earned an extra stamp.' : '',
+    rewardsReceipt?.birthday ? 'Happy birthday. You earned a bonus stamp.' : '',
+    rewardsReceipt?.included || '',
+  ].filter(Boolean).join(' ')
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
       <div className="bg-gray-900 rounded-3xl shadow-2xl p-8 text-center max-w-lg w-full border border-gray-700">
@@ -27,6 +44,12 @@ export default function PaymentSuccess({ orderData, onReturnToProducts }: Paymen
           </div>
         </div>
         
+        {progress ? (
+          <div className="mb-6 text-left">
+            <RewardsCard progress={progress} note={notes || null} />
+          </div>
+        ) : null}
+
         <div className="bg-blue-900/30 rounded-lg p-4 border border-blue-700 mb-6">
           <p className="text-gray-300 text-lg mb-4 text-center">
             Thanks for your purchase, your order should arrive within 5-15min of purchase.

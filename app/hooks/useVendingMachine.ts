@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Product, CartItem, OrderData } from '../../types';
+import { OrderRewardsReceipt } from '../../lib/rewards';
+import { rememberCustomer } from './useRewards';
 
 export const useVendingMachine = (initialProducts: Product[] = [], refetchProducts?: () => void) => {
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -9,6 +11,20 @@ export const useVendingMachine = (initialProducts: Product[] = [], refetchProduc
   const [orderData, setOrderData] = useState<OrderData>({ name: '', apartment: '', email: '' });
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [paymentError, setPaymentError] = useState<string>('');
+  const [rewardsReceipt, setRewardsReceipt] = useState<OrderRewardsReceipt | null>(null);
+
+  useEffect(() => {
+    const email = window.localStorage.getItem('snaky-rewards-email') || '';
+    const name = window.localStorage.getItem('snaky-rewards-name') || '';
+    const apartment = window.localStorage.getItem('snaky-rewards-apartment') || '';
+    if (!email && !name && !apartment) return;
+    setOrderData((current) => ({
+      ...current,
+      name: current.name || name,
+      apartment: current.apartment || apartment,
+      email: current.email || email,
+    }));
+  }, []);
 
   const addToCart = (product: Product) => {
     if (product.stock === 0) return;
@@ -45,12 +61,32 @@ export const useVendingMachine = (initialProducts: Product[] = [], refetchProduc
   };
 
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (paymentIntentId?: string) => {
     // Set processing state to show loading screen
     setPaymentStatus('processing');
-    
-    // Add a satisfying 3-second delay before showing success
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    rememberCustomer(orderData);
+
+    const applyStamps = async () => {
+      if (!paymentIntentId) return null;
+      try {
+        const response = await fetch('/api/rewards/stamp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentIntentId }),
+        });
+        if (!response.ok) return null;
+        const data = await response.json();
+        return (data.receipt || null) as OrderRewardsReceipt | null;
+      } catch {
+        return null;
+      }
+    };
+
+    const [receipt] = await Promise.all([
+      applyStamps(),
+      new Promise(resolve => setTimeout(resolve, 3000)),
+    ]);
+    setRewardsReceipt(receipt);
     
     // Show success after the delay
     setPaymentStatus('success');
@@ -101,7 +137,8 @@ export const useVendingMachine = (initialProducts: Product[] = [], refetchProduc
           body: JSON.stringify({
             orderData,
             cart,
-            totalAmount: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+            totalAmount: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+            paymentIntentId,
           }),
         });
 
@@ -147,7 +184,8 @@ export const useVendingMachine = (initialProducts: Product[] = [], refetchProduc
 
   const handleReturnToProducts = () => {
     setPaymentStatus('idle');
-    setOrderData({ name: '', apartment: '', email: '' });
+    setRewardsReceipt(null);
+    setOrderData({ name: '', apartment: '', email: '', referralCode: '' });
     setView('products');
   };
 
@@ -159,6 +197,7 @@ export const useVendingMachine = (initialProducts: Product[] = [], refetchProduc
     orderData,
     paymentStatus,
     paymentError,
+    rewardsReceipt,
     showCustomerModal,
     
     // Actions

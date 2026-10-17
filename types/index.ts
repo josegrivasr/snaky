@@ -20,4 +20,5 @@ export interface OrderData {
   name: string;
   apartment: string;
   email: string;
+  referralCode?: string;
 }

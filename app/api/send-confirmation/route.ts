@@ -1,9 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { processRewards } from '../../../lib/loyalty';
+import { OrderRewardsReceipt, rewardList } from '../../../lib/rewards';
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function rewardsCopy(receipt: OrderRewardsReceipt): { text: string; html: string } {
+  const lines = [
+    `Snaky Rewards: ${receipt.filled}/10 stamps.`,
+    receipt.message,
+    receipt.bonus ? 'BONUS! You earned an extra stamp.' : '',
+    receipt.birthday ? 'Happy birthday. You earned a bonus stamp.' : '',
+    receipt.included ? `INCLUDE: ${receipt.included}` : '',
+    receipt.unlocked.length > 0 ? `Unlocked for the next order: ${rewardList(receipt.unlocked)}.` : '',
+  ].filter(Boolean);
+  const text = lines.join('\n');
+  const html = `
+    <div style="background-color: #fff7ed; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f97316;">
+      <h2 style="color: #9a3412; font-size: 22px; margin: 0 0 10px;">Snaky Rewards</h2>
+      ${lines.map((line) => `<p style="font-size: 16px; margin: 6px 0; color: #7c2d12;">${escapeHtml(line)}</p>`).join('')}
+    </div>
+  `;
+  return { text, html };
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { orderData, cart, totalAmount } = await request.json();
+    const { orderData, cart, totalAmount, paymentIntentId } = await request.json();
+    let rewardsText = '';
+    let rewardsHtml = '';
+    if (typeof paymentIntentId === 'string' && paymentIntentId) {
+      try {
+        const receipt = await processRewards(paymentIntentId);
+        const copy = rewardsCopy(receipt);
+        rewardsText = `\n${copy.text}\n`;
+        rewardsHtml = copy.html;
+      } catch {
+        rewardsText = '';
+        rewardsHtml = '';
+      }
+    }
 
     // Create transporter using Gmail (you can use other providers)
     const transporter = nodemailer.createTransport({
@@ -37,6 +78,7 @@ ${cart.map((item: any) => `${item.name} x${item.quantity} - $${(item.price * ite
 
 Total:
 $${totalAmount.toFixed(2)}
+${rewardsText}
       `,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -59,6 +101,7 @@ $${totalAmount.toFixed(2)}
           <div style="background-color: #10b981; color: white; padding: 20px; border-radius: 8px; margin: 15px 0;">
             <p style="font-size: 32px; font-weight: bold; margin: 0;">$${totalAmount.toFixed(2)}</p>
           </div>
+          ${rewardsHtml}
         </div>
       `,
     };
@@ -81,6 +124,7 @@ ${cart.map((item: any) => `${item.name} x${item.quantity} - $${(item.price * ite
 
 Total:
 $${totalAmount.toFixed(2)}
+${rewardsText}
       `,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -103,6 +147,7 @@ $${totalAmount.toFixed(2)}
           <div style="background-color: #10b981; color: white; padding: 20px; border-radius: 8px; margin: 15px 0;">
             <p style="font-size: 32px; font-weight: bold; margin: 0;">$${totalAmount.toFixed(2)}</p>
           </div>
+          ${rewardsHtml}
         </div>
       `,
     };

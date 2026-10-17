@@ -9,6 +9,7 @@ import PaymentForm from './components/PaymentForm';
 import PaymentSuccess from './components/PaymentSuccess';
 import PaymentError from './components/PaymentError';
 import CustomerInfoModal from './components/CustomerInfoModal';
+import RewardsBanner from './components/RewardsBanner';
 
 // Data & Hooks
 import { useVendingMachine } from './hooks/useVendingMachine';
@@ -23,6 +24,7 @@ const VendingMachine = () => {
     orderData,
     paymentStatus,
     paymentError,
+    rewardsReceipt,
     showCustomerModal,
     setView,
     setOrderData,
@@ -37,7 +39,7 @@ const VendingMachine = () => {
   } = useVendingMachine(products, refetchProducts);
 
   if (paymentStatus === 'success') {
-    return <PaymentSuccess orderData={orderData} onReturnToProducts={handleReturnToProducts} />;
+    return <PaymentSuccess orderData={orderData} rewardsReceipt={rewardsReceipt} onReturnToProducts={handleReturnToProducts} />;
   }
 
   if (paymentStatus === 'processing') {
@@ -175,6 +177,8 @@ const VendingMachine = () => {
             </div>
           </div>
         </div>
+
+        <RewardsBanner />
 
         {view === 'products' && (
           <>

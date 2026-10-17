@@ -2,6 +2,9 @@
 
 import React, { useState } from 'react';
 import { OrderData } from '../../types';
+import { rewardList } from '../../lib/rewards';
+import { useRewards } from '../hooks/useRewards';
+import RewardsCard from './RewardsCard';
 
 interface CustomerInfoModalProps {
   isOpen: boolean;
@@ -21,6 +24,7 @@ export default function CustomerInfoModal({
   isProcessing 
 }: CustomerInfoModalProps) {
   const [emailError, setEmailError] = useState('');
+  const { progress } = useRewards(orderData.email);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -102,6 +106,30 @@ export default function CustomerInfoModal({
                 {emailError}
               </p>
             )}
+            <p className="text-gray-500 text-sm mt-2">This email is your Snaky Rewards card.</p>
+          </div>
+
+          {progress?.found ? (
+            <div className="space-y-2">
+              <RewardsCard progress={progress} />
+              {progress.pending.length > 0 ? (
+                <p className="text-sm font-semibold text-amber-700">
+                  This order includes your {rewardList(progress.pending)}.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          <div>
+            <label className="block text-gray-700 font-semibold mb-3 text-sm uppercase tracking-wide">Friend&apos;s code, optional</label>
+            <input
+              type="text"
+              value={orderData.referralCode || ''}
+              onChange={(e) => onOrderDataChange({ ...orderData, referralCode: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-200 bg-gray-50/50 uppercase"
+              placeholder="ABC123"
+              disabled={isProcessing}
+            />
           </div>
         </div>
 

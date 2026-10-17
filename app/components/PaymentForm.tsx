@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { CartItem, OrderData } from '../../types';
+import { rewardList } from '../../lib/rewards';
+import { useRewards } from '../hooks/useRewards';
+import RewardsCard from './RewardsCard';
 
 // Initialize Stripe with production keys
 const getStripePromise = () => {
@@ -19,7 +22,7 @@ const stripePromise = getStripePromise();
 interface PaymentFormProps {
   cart: CartItem[];
   orderData: OrderData;
-  onPaymentSuccess: () => void;
+  onPaymentSuccess: (paymentIntentId: string) => void;
   onPaymentError: (error: string) => void;
   onBack: () => void;
 }
@@ -29,6 +32,7 @@ function PaymentFormInner({ cart, orderData, onPaymentSuccess, onPaymentError, o
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
+  const { progress } = useRewards(orderData.email);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -51,7 +55,7 @@ function PaymentFormInner({ cart, orderData, onPaymentSuccess, onPaymentError, o
       if (error) {
         onPaymentError(error.message || 'Payment failed');
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        onPaymentSuccess();
+        onPaymentSuccess(paymentIntent.id);
       } else {
         onPaymentError('Payment was not completed. Please try again.');
       }
@@ -87,6 +91,17 @@ function PaymentFormInner({ cart, orderData, onPaymentSuccess, onPaymentError, o
                 }}
               />
             </div>
+
+            {progress?.found ? (
+              <div className="space-y-2">
+                <RewardsCard progress={progress} />
+                {progress.pending.length > 0 ? (
+                  <p className="text-sm font-semibold text-amber-200">
+                    This order includes your {rewardList(progress.pending)}.
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
             {/* Order Summary */}
             <div className="bg-gray-800/90 rounded-xl p-4 shadow-lg">

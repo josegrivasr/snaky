@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
         customer_name: orderData.name,
         apartment_number: orderData.apartment,
         customer_email: orderData.email,
+        referral_code: (orderData.referralCode || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8),
         // Store cart items as JSON string for email confirmations and analytics
         cart: JSON.stringify(cart.map((item: any) => ({
           id: item.id,
