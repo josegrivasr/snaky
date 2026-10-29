@@ -5,8 +5,14 @@ import { reverseRewards } from '../../../../lib/loyalty'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
-  const secret = process.env.STRIPE_WEBHOOK_SECRET
-  const key = process.env.STRIPE_SECRET_KEY
+  const secret =
+    process.env.NODE_ENV === 'development' && process.env.DEV_STRIPE_WEBHOOK_SECRET
+      ? process.env.DEV_STRIPE_WEBHOOK_SECRET
+      : process.env.STRIPE_WEBHOOK_SECRET
+  const key =
+    process.env.NODE_ENV === 'development' && process.env.DEV_STRIPE_SECRET_KEY
+      ? process.env.DEV_STRIPE_SECRET_KEY
+      : process.env.STRIPE_SECRET_KEY
   if (!secret || !key) {
     return NextResponse.json({ error: 'Webhook is not configured' }, { status: 500 })
   }
